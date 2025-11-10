@@ -1,0 +1,78 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+
+# C++
+*.o
+*.a
+*.so
+*.exe
+*.out
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+Makefile
+
+# Build directories
+cpp/build/
+cpp/build-*/
+python/build/
+python/dist/
+
+# Models (large files)
+*.onnx
+*.pth
+*.wk
+*.caffemodel
+
+# Data
+data/calibration/*.jpg
+data/calibration/*.png
+data/samples/**/*.jpg
+data/test/**/*.jpg
+
+# Logs
+*.log
+logs/
+
+# Test outputs
+benchmark_results.json
+evaluation_results.json
+
+# Temporary files
+*.tmp
+*.bak
+.cache/

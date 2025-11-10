@@ -1,0 +1,68 @@
+{
+  "version": "1.0.0",
+  "platform": "generic",
+
+  "models": {
+    "liveness_model": "models/minifasnet_dual_int8.onnx",
+    "feature_model_rgb": "models/arcface_r34_rgb_int8.onnx",
+    "feature_model_ir": "models/arcface_r34_ir_int8.onnx"
+  },
+
+  "thresholds": {
+    "liveness": 0.90,
+    "quality": 0.50
+  },
+
+  "input": {
+    "rgb_width": 1280,
+    "rgb_height": 720,
+    "ir_width": 1280,
+    "ir_height": 720,
+    "face_size": 112
+  },
+
+  "inference": {
+    "device": "onnxruntime",
+    "num_threads": 2,
+    "batch_size": 1
+  },
+
+  "preprocessing": {
+    "enable_denoise": true,
+    "enable_enhancement": true,
+    "enable_color_correction": true,
+    "enable_histogram_equalization": true
+  },
+
+  "fusion": {
+    "strategy": "adaptive",
+    "rgb_weight_high_light": 0.8,
+    "ir_weight_high_light": 0.2,
+    "rgb_weight_medium_light": 0.5,
+    "ir_weight_medium_light": 0.5,
+    "rgb_weight_low_light": 0.2,
+    "ir_weight_low_light": 0.8,
+    "light_threshold_high": 100,
+    "light_threshold_low": 10
+  },
+
+  "quality": {
+    "blur_threshold": 100.0,
+    "brightness_min": 40,
+    "brightness_max": 220,
+    "pose_angle_threshold": 30
+  },
+
+  "logging": {
+    "level": "info",
+    "save_log": true,
+    "log_path": "/var/log/ocfa_face.log",
+    "console_output": true
+  },
+
+  "performance": {
+    "enable_parallel_inference": true,
+    "enable_neon_optimization": true,
+    "enable_pipeline": false
+  }
+}
