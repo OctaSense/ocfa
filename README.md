@@ -1,4 +1,4 @@
-# OCFA FaceID Recognition SDK
+# OCFA Face Recognition SDK
 
 [中文文档](docs/README.md) | English
 
@@ -26,8 +26,8 @@ A production-ready face recognition SDK for embedded Linux platforms, featuring 
 
 ```bash
 # Clone repository
-git clone https://github.com/OctaSense/faceid.git
-cd faceid
+git clone https://github.com/OctaSense/ocfa.git
+cd ocfa
 
 # Python SDK (Development)
 pip install -r python/requirements.txt
@@ -133,7 +133,7 @@ See [models/README.md](models/README.md) and [ARCFACE_MODELS.md](ARCFACE_MODELS.
 ## Project Structure
 
 ```
-faceid/
+ocfa/
 ├── python/              # Python SDK
 │   ├── ocfa/           # Core modules
 │   ├── tests/          # Unit tests
@@ -232,11 +232,11 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 If you use this SDK in your research, please cite:
 
 ```bibtex
-@software{ocfa_faceid_sdk,
-  title={OCFA FaceID Recognition SDK},
-  author={OCTA FaceID Recognition SDK Contributors},
+@software{ocfa_face_sdk,
+  title={OCFA Face Recognition SDK},
+  author={OCFA Face Recognition SDK Contributors},
   year={2025},
-  url={https://github.com/OctaSense/faceid}
+  url={https://github.com/OctaSense/ocfa}
 }
 
 @inproceedings{deng2019arcface,
@@ -260,9 +260,9 @@ Contributions are welcome! Please read our contributing guidelines before submit
 
 ## Support
 
-- Issues: [GitHub Issues](https://github.com/OctaSense/faceid/issues)
+- Issues: [GitHub Issues](https://github.com/OctaSense/ocfa/issues)
 - Documentation: [docs/](docs/)
-- Repository: https://github.com/OctaSense/faceid
+- Repository: https://github.com/OctaSense/ocfa
 
 ## Acknowledgments
 

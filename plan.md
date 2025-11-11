@@ -1,4 +1,4 @@
-# OCTA FaceID SDK 项目实施计划
+# OCFA Face SDK 项目实施计划
 
 ## 项目概述
 
@@ -18,7 +18,7 @@
 ## 项目目录结构
 
 ```
-octas/faceid/
+octas/ocfa/
 ├── README.md                      # 项目说明
 ├── ARCHITECTURE.md                # 架构文档 (已有)
 ├── sdk.md                         # SDK需求 (已有)

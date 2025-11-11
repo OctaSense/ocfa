@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(ocfa_faceid_sdk VERSION 1.0.1 LANGUAGES C CXX)
+project(ocfa_face_sdk VERSION 1.0.2 LANGUAGES C CXX)
 
 # C++ Standard
 set(CMAKE_CXX_STANDARD 17)
@@ -162,7 +162,7 @@ endif()
 
 # Print configuration summary
 message(STATUS "")
-message(STATUS "====== OCFA FaceID SDK Configuration ======")
+message(STATUS "====== OCFA Face SDK Configuration ======")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "C++ standard: ${CMAKE_CXX_STANDARD}")
 message(STATUS "System processor: ${CMAKE_SYSTEM_PROCESSOR}")

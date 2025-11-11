@@ -1,4 +1,4 @@
-# OCFA FaceID SDK
+# OCFA Face SDK
 
 高性能嵌入式人脸识别算法 SDK，支持 RGB-IR 双模态活体检测、人脸特征提取和人脸比对功能。
 
@@ -28,7 +28,7 @@ cmake .. -DUSE_ONNXRUNTIME=ON && make -j4
 
 ## 项目概述
 
-OCFA FaceID SDK 是一个面向嵌入式 Linux 平台的轻量级人脸识别解决方案，专为海思 Hi3516CV610 等低功耗平台优化。
+OCFA Face SDK 是一个面向嵌入式 Linux 平台的轻量级人脸识别解决方案，专为海思 Hi3516CV610 等低功耗平台优化。
 
 ### 核心特性
 
@@ -87,7 +87,7 @@ OCFA FaceID SDK 是一个面向嵌入式 Linux 平台的轻量级人脸识别解
 ## 项目结构
 
 ```
-octas/faceid/
+octas/ocfa/
 ├── README.md                  # 项目说明 (本文件)
 ├── ARCHITECTURE.md            # 架构文档
 ├── plan.md                    # 实施计划
