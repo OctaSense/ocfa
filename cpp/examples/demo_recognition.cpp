@@ -88,11 +88,12 @@ int main(int argc, char** argv) {
     auto ir_image = create_dummy_ir_image(width, height);
     printf("Test images created\\n\\n");
 
-    // 3. Perform recognition
-    printf("Performing face recognition...\\n");
+    // 3. Perform recognition with livecheck=1 (enable liveness detection)
+    printf("Performing face recognition (livecheck=1, with liveness detection)...\\n");
 
     ocfa_recognition_result_t result;
-    ret = ocfa_recognize(rgb_image.data(), ir_image.data(), width, height, &result);
+    int livecheck = 1;  // 1 = enable RGB+IR liveness detection
+    ret = ocfa_recognize(rgb_image.data(), ir_image.data(), width, height, livecheck, &result);
 
     if (ret == OCFA_SUCCESS) {
         printf("Recognition successful!\\n");
@@ -120,8 +121,37 @@ int main(int argc, char** argv) {
         printf("Error message: %s\\n", result.error_msg);
     }
 
-    // 4. Test database operations (if feature extracted)
-    if (ret == OCFA_SUCCESS && result.feature_extracted) {
+    // 3b. Test bypass mode (livecheck=0)
+    printf("\\nPerforming face recognition (livecheck=0, bypass liveness detection)...\\n");
+
+    ocfa_recognition_result_t result_bypass;
+    livecheck = 0;  // 0 = bypass liveness detection
+    ret = ocfa_recognize(rgb_image.data(), ir_image.data(), width, height, livecheck, &result_bypass);
+
+    if (ret == OCFA_SUCCESS) {
+        printf("Recognition successful (bypass mode)!\\n");
+        printf("  Liveness: %.3f (bypassed)\\n", result_bypass.liveness_score);
+        printf("  Quality:  %.3f (threshold: %.2f) - %s\\n",
+               result_bypass.quality_score,
+               config.quality_threshold,
+               result_bypass.quality_passed ? "PASSED" : "FAILED");
+        printf("  Feature:  %s\\n",
+               result_bypass.feature_extracted ? "EXTRACTED" : "FAILED");
+        printf("  Total time: %u ms\\n", result_bypass.total_time_ms);
+
+        if (result.total_time_ms > 0 && result_bypass.total_time_ms > 0) {
+            float speedup = (float)(result.total_time_ms - result_bypass.total_time_ms) / result.total_time_ms * 100.0f;
+            if (speedup > 0) {
+                printf("  Performance gain: %.1f%% faster (bypassed liveness detection)\\n", speedup);
+            }
+        }
+    } else {
+        printf("Recognition failed (bypass mode): %s\\n", ocfa_get_error_string(ret));
+        printf("Error message: %s\\n", result_bypass.error_msg);
+    }
+
+    // 4. Test database operations (if feature extracted from bypass mode)
+    if (ret == OCFA_SUCCESS && result_bypass.feature_extracted) {
         printf("\\nTesting database operations...\\n");
 
         // Add user to database
@@ -132,7 +162,7 @@ int main(int argc, char** argv) {
         print_user_id(user_id);
         printf("\\n");
 
-        ret = ocfa_add_user(user_id, result.feature);
+        ret = ocfa_add_user(user_id, result_bypass.feature);
         if (ret != OCFA_SUCCESS) {
             printf("Failed to add user: %s\\n", ocfa_get_error_string(ret));
         } else {
@@ -144,7 +174,7 @@ int main(int argc, char** argv) {
             uint8_t matched_id[OCFA_USER_ID_LEN];
             float similarity;
 
-            ret = ocfa_search_user(result.feature, matched_id, &similarity);
+            ret = ocfa_search_user(result_bypass.feature, matched_id, &similarity);
             if (ret == OCFA_SUCCESS) {
                 printf("Found user: ");
                 print_user_id(matched_id);
@@ -163,7 +193,7 @@ int main(int argc, char** argv) {
             // Test 1:N search with threshold
             printf("\\nTesting 1:N search (threshold=0.5)...\\n");
             ocfa_search_result_t results[10];
-            int count = ocfa_search_users(result.feature, 0.5f, results, 10);
+            int count = ocfa_search_users(result_bypass.feature, 0.5f, results, 10);
 
             if (count > 0) {
                 printf("Found %d matches:\\n", count);
@@ -182,8 +212,8 @@ int main(int argc, char** argv) {
 
     // 5. Test feature comparison
     printf("\\nTesting feature comparison...\\n");
-    if (result.feature_extracted) {
-        float self_sim = ocfa_compare_feature(result.feature, result.feature);
+    if (result_bypass.feature_extracted) {
+        float self_sim = ocfa_compare_feature(result_bypass.feature, result_bypass.feature);
         printf("Self-similarity: %.3f (should be ~1.0)\\n", self_sim);
     }
 

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(ocfa_face_sdk VERSION 1.0.0 LANGUAGES C CXX)
+project(ocfa_faceid_sdk VERSION 1.0.1 LANGUAGES C CXX)
 
 # C++ Standard
 set(CMAKE_CXX_STANDARD 17)
@@ -16,9 +16,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 
-# ARM NEON optimization
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm" OR CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+# ARM NEON optimization (only for Linux ARM, not macOS)
+if((CMAKE_SYSTEM_PROCESSOR MATCHES "arm" OR CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64") AND NOT APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpu=neon -mfloat-abi=hard")
+    add_definitions(-DUSE_NEON)
+elseif(APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "arm64")
+    # macOS ARM64 (Apple Silicon) - NEON support is implicit
     add_definitions(-DUSE_NEON)
 endif()
 
@@ -159,7 +162,7 @@ endif()
 
 # Print configuration summary
 message(STATUS "")
-message(STATUS "====== OCFA Face SDK Configuration ======")
+message(STATUS "====== OCFA FaceID SDK Configuration ======")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "C++ standard: ${CMAKE_CXX_STANDARD}")
 message(STATUS "System processor: ${CMAKE_SYSTEM_PROCESSOR}")

@@ -35,7 +35,8 @@ class MiniFASNetModel:
         self.use_onnx = use_onnx
         self.session = None
         self.model = None
-        self.input_size = (112, 112)
+        # MiniFASNet v2 uses 80x80 input
+        self.input_size = (80, 80)
 
         self._load_model()
 
@@ -177,34 +178,40 @@ class MiniFASNetModel:
         Run ONNX inference
 
         Args:
-            rgb_tensor: RGB tensor (1, 3, 112, 112)
-            ir_tensor: IR tensor (1, 1, 112, 112)
+            rgb_tensor: RGB tensor (1, 3, 80, 80)
+            ir_tensor: IR tensor (1, 1, 80, 80) - may not be used for single-stream models
 
         Returns:
             Liveness score [0, 1]
         """
         # Build input dict
         # This depends on model's input names
-        # Assuming: input_0 for RGB, input_1 for IR
+        # For MiniFASNet v2 (single-stream RGB): only use RGB
         inputs = {}
         if len(self.input_names) == 2:
+            # Dual-stream model
             inputs[self.input_names[0]] = rgb_tensor
             inputs[self.input_names[1]] = ir_tensor
         elif len(self.input_names) == 1:
-            # Concatenated input
-            combined = np.concatenate([rgb_tensor, ir_tensor], axis=1)
-            inputs[self.input_names[0]] = combined
+            # Single-stream model - use RGB only
+            inputs[self.input_names[0]] = rgb_tensor
         else:
             raise ValueError(f"Unexpected number of inputs: {len(self.input_names)}")
 
         outputs = self.session.run(self.output_names, inputs)
 
-        # Output shape: (1, 2) for [fake_score, real_score]
+        # Output shape: (1, 3) for [real, fake, mask] scores (MiniFASNet v2)
+        # or (1, 2) for [fake, real] scores
         # or (1, 1) for single score
         output = outputs[0][0]
 
-        if len(output) == 2:
-            # Binary classification: [fake_prob, real_prob]
+        if len(output) >= 3:
+            # MiniFASNet v2: [real_prob, fake_prob, mask_prob]
+            # Use real_prob as the liveness score
+            real_score = float(output[0])
+        elif len(output) == 2:
+            # Binary classification: [fake_prob, real_prob] or [real_prob, fake_prob]
+            # Assume second element is real_prob
             real_score = float(output[1])
         else:
             # Single score

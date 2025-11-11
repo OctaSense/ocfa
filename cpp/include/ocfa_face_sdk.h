@@ -49,12 +49,15 @@ int ocfa_release(void);
  * @param ir_image IR image data (720p, grayscale)
  * @param width Image width (e.g., 1280)
  * @param height Image height (e.g., 720)
+ * @param livecheck Liveness detection mode:
+ *                  0 = Skip liveness detection (bypass)
+ *                  1 = RGB+IR dual-modal liveness detection
  * @param result Output recognition result (includes feature vector)
  * @return OCFA_SUCCESS on success, error code otherwise
  *
  * @note This function performs the complete recognition pipeline:
  *       1. Preprocessing
- *       2. Liveness detection
+ *       2. Liveness detection (if livecheck != 0)
  *       3. Quality assessment
  *       4. Feature extraction
  *       5. Feature fusion
@@ -65,6 +68,7 @@ int ocfa_recognize(
     const uint8_t* ir_image,
     int width,
     int height,
+    int livecheck,
     ocfa_recognition_result_t* result
 );
 

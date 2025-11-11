@@ -20,6 +20,7 @@ from .utils import (
     bytes_to_user_id,
     user_id_to_bytes
 )
+from .sdk import OCFAFaceSDK
 
 # Submodules will be imported lazily to avoid circular dependencies
 # and reduce initial import time
@@ -29,6 +30,9 @@ __all__ = [
     '__version__',
     '__author__',
     '__license__',
+
+    # Main SDK class
+    'OCFAFaceSDK',
 
     # Configuration
     'OCFAConfig',

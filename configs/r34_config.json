@@ -1,11 +1,12 @@
 {
   "version": "1.0.0",
   "platform": "generic",
+  "comment": "ArcFace R34 optimized configuration - faster feature extraction (~30% speedup vs R50)",
 
   "models": {
     "liveness_model": "models/minifasnet_v2.onnx",
-    "feature_model_rgb": "models/buffalo_l/w600k_r50.onnx",
-    "feature_model_ir": "models/buffalo_l/w600k_r50.onnx"
+    "feature_model_rgb": "models/arcface_r34_ms1mv3.onnx",
+    "feature_model_ir": "models/arcface_r34_ms1mv3.onnx"
   },
 
   "thresholds": {

@@ -230,6 +230,7 @@ int ocfa_recognize(
     const uint8_t* ir_image,
     int width,
     int height,
+    int livecheck,
     ocfa_recognition_result_t* result
 ) {
     if (!g_sdk_initialized) {
@@ -245,16 +246,32 @@ int ocfa_recognize(
 
     auto start_time = std::chrono::steady_clock::now();
 
-    // 1. Liveness detection
-    float liveness_score = 0.0f;
-    int ret = ocfa_detect_liveness(rgb_image, ir_image, width, height, &liveness_score);
-    result->liveness_score = liveness_score;
-    result->liveness_passed = (ret == OCFA_SUCCESS && liveness_score >= g_config.liveness_threshold);
+    // 1. Liveness detection (if enabled)
+    int ret = OCFA_SUCCESS;
+    if (livecheck != 0) {
+        // Perform RGB+IR dual-modal liveness detection
+        float liveness_score = 0.0f;
+        ret = ocfa_detect_liveness(rgb_image, ir_image, width, height, &liveness_score);
+        result->liveness_score = liveness_score;
+        result->liveness_passed = (ret == OCFA_SUCCESS && liveness_score >= g_config.liveness_threshold);
 
-    if (ret != OCFA_SUCCESS) {
-        result->error_code = ret;
-        snprintf(result->error_msg, OCFA_MAX_ERROR_MSG, "Liveness detection failed");
-        return ret;
+        if (ret != OCFA_SUCCESS) {
+            result->error_code = ret;
+            snprintf(result->error_msg, OCFA_MAX_ERROR_MSG, "Liveness detection failed");
+            return ret;
+        }
+
+        if (!result->liveness_passed) {
+            result->error_code = OCFA_ERROR_LIVENESS_FAILED;
+            snprintf(result->error_msg, OCFA_MAX_ERROR_MSG,
+                     "Liveness check failed (score: %.3f, threshold: %.3f)",
+                     liveness_score, g_config.liveness_threshold);
+            return OCFA_ERROR_LIVENESS_FAILED;
+        }
+    } else {
+        // Bypass liveness detection
+        result->liveness_score = 1.0f;  // Set to maximum to indicate bypass
+        result->liveness_passed = true;
     }
 
     // 2. Quality assessment

@@ -34,6 +34,16 @@ class FaceRecognitionResult:
         self.error_msg = ""
         self.quality_details = {}
 
+    @property
+    def success(self) -> bool:
+        """Check if recognition was successful"""
+        return self.error_code == 0 and self.feature_extracted
+
+    @property
+    def error_message(self) -> str:
+        """Alias for error_msg for consistency"""
+        return self.error_msg
+
 
 class OCFAFaceSDK:
     """
@@ -70,10 +80,15 @@ class OCFAFaceSDK:
         # Liveness detection
         liveness_model = self.config.liveness_model_path
         liveness_threshold = self.config.liveness_threshold
+        use_ir_detection = self.config.use_ir_detection
+        ir_weights = (self.config.ir_rgb_weight, self.config.ir_ir_weight)
+
         self.liveness_detector = LivenessDetector(
             liveness_model,
             threshold=liveness_threshold,
-            device=self.config.device
+            device=self.config.device,
+            use_ir_detection=use_ir_detection,
+            ir_weights=ir_weights
         )
 
         # Quality assessment
@@ -101,13 +116,14 @@ class OCFAFaceSDK:
 
     def recognize(self,
                   rgb_image: np.ndarray,
-                  ir_image: np.ndarray) -> FaceRecognitionResult:
+                  ir_image: np.ndarray,
+                  livecheck: int = 1) -> FaceRecognitionResult:
         """
         Complete recognition pipeline (to feature extraction)
 
         Pipeline:
         1. Preprocessing
-        2. Liveness detection
+        2. Liveness detection (if livecheck != 0)
         3. Quality assessment
         4. Feature extraction
         5. Feature fusion
@@ -115,6 +131,9 @@ class OCFAFaceSDK:
         Args:
             rgb_image: RGB image (H, W, 3), uint8
             ir_image: IR image (H, W) or (H, W, 1), uint8
+            livecheck: Liveness detection mode:
+                       0 = Skip liveness detection (bypass)
+                       1 = RGB+IR dual-modal liveness detection (default)
 
         Returns:
             FaceRecognitionResult
@@ -133,17 +152,23 @@ class OCFAFaceSDK:
                 rgb_face = self.preprocessor.crop_face(rgb_preprocessed, face_size)
                 ir_face = self.preprocessor.crop_face(ir_preprocessed, face_size)
 
-                # Step 2: Liveness detection
-                liveness_passed, liveness_score = self.liveness_detector.detect(
-                    rgb_face, ir_face
-                )
-                result.liveness_passed = liveness_passed
-                result.liveness_score = liveness_score
+                # Step 2: Liveness detection (if enabled)
+                if livecheck != 0:
+                    # Perform RGB+IR dual-modal liveness detection
+                    liveness_passed, liveness_score = self.liveness_detector.detect(
+                        rgb_face, ir_face
+                    )
+                    result.liveness_passed = liveness_passed
+                    result.liveness_score = liveness_score
 
-                if not liveness_passed:
-                    result.error_code = 1
-                    result.error_msg = "Liveness detection failed"
-                    return result
+                    if not liveness_passed:
+                        result.error_code = 1
+                        result.error_msg = f"Liveness detection failed (score: {liveness_score:.3f}, threshold: {self.config.liveness_threshold:.3f})"
+                        return result
+                else:
+                    # Bypass liveness detection
+                    result.liveness_passed = True
+                    result.liveness_score = 1.0  # Set to maximum to indicate bypass
 
                 # Step 3: Quality assessment
                 quality_passed, quality_score, quality_details = self.quality_assessor.assess(

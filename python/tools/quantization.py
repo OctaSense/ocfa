@@ -308,9 +308,11 @@ def main():
 
             if args.model_type == 'arcface':
                 # Single-stream model
+                # Note: Input name may vary (e.g., 'input', 'input.1', 'data')
+                # Check your model's input name first
                 calibration_reader = FaceCalibrationDataReader(
                     args.calib_data,
-                    input_name='input',
+                    input_name='input.1',  # For buffalo_l w600k_r50 model
                     input_shape=(1, 3, 112, 112)
                 )
             else:

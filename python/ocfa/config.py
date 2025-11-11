@@ -62,6 +62,14 @@ class OCFAConfig:
                 "liveness": 0.90,
                 "quality": 0.50
             },
+            "liveness": {
+                "use_ir_detection": True,
+                "ir_thermal_variance_threshold": 100.0,
+                "ir_bright_region_threshold": 0.1,
+                "ir_confidence_threshold": 0.4,
+                "rgb_weight": 0.6,
+                "ir_weight": 0.4
+            },
             "input": {
                 "rgb_width": 1280,
                 "rgb_height": 720,
@@ -233,6 +241,36 @@ class OCFAConfig:
     def num_threads(self) -> int:
         """Get number of inference threads"""
         return self.get('inference.num_threads', 2)
+
+    @property
+    def use_ir_detection(self) -> bool:
+        """Get whether to use IR face detection for enhanced liveness"""
+        return self.get('liveness.use_ir_detection', True)
+
+    @property
+    def ir_thermal_variance_threshold(self) -> float:
+        """Get IR thermal variance threshold"""
+        return self.get('liveness.ir_thermal_variance_threshold', 100.0)
+
+    @property
+    def ir_bright_region_threshold(self) -> float:
+        """Get IR bright region threshold"""
+        return self.get('liveness.ir_bright_region_threshold', 0.1)
+
+    @property
+    def ir_confidence_threshold(self) -> float:
+        """Get IR confidence threshold"""
+        return self.get('liveness.ir_confidence_threshold', 0.4)
+
+    @property
+    def ir_rgb_weight(self) -> float:
+        """Get RGB weight for IR-enhanced liveness"""
+        return self.get('liveness.rgb_weight', 0.6)
+
+    @property
+    def ir_ir_weight(self) -> float:
+        """Get IR weight for IR-enhanced liveness"""
+        return self.get('liveness.ir_weight', 0.4)
 
 
 def load_config(config_path: Optional[str] = None) -> OCFAConfig:

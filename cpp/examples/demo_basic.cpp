@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
+#include <cmath>
 
 // Helper function to print user ID
 void print_user_id(const uint8_t user_id[OCFA_USER_ID_LEN]) {
